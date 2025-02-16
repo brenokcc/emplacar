@@ -6,8 +6,8 @@ class ApiApplication(Application):
         super().__init__()
         self.title = "Emplacar"
         self.subtitle = "Validação de Emplacamento Veicular"
-        self.icon = "/static/images/scan.png"
-        self.logo = "/static/images/scan.png"
+        self.icon = "/static/images/logo.png"
+        self.logo = "/static/images/logo.png"
         self.groups.add(administrador='Administrador', operador= "Operador")
         self.dashboard.usermenu.add(
             "dev.icons", "user.users", "log.logs", "email.emails",
