@@ -24,12 +24,12 @@ class ApiApplication(Application):
         #     "Sair": "auth.logout"
         # })
         self.menu.add({
-            "Tipos de Vículo": "tipoveiculo.tiposveiculo",
-            "Cores": "cor.cores",
-            "Marcas": "marca.marcas",
-            "Modelos": "modelo.modelos",
-            "Pessoas": "pessoa.pessoas",
-            "Estampadores": "estampador.estampadores",
-            "Emplacamentos": "emplacamento.emplacamentos",
-            "Sair": "auth.logout"
+            "clipboard-list:Tipos de Vículo": "tipoveiculo.tiposveiculo",
+            "paintbrush:Cores": "cor.cores",
+            "bookmark:Marcas": "marca.marcas",
+            "car-side:Modelos": "modelo.modelos",
+            "users-line:Pessoas": "pessoa.pessoas",
+            "store-alt:Estampadores": "estampador.estampadores",
+            "border-none:Emplacamentos": "emplacamento.emplacamentos",
+            "sign-out:Sair": "auth.logout"
         })
