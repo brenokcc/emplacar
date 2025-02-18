@@ -192,7 +192,7 @@ class Emplacamento(models.Model):
             id=self.id,
             autorizacao=self.autorizacao,
             tipo_veiculo=self.tipo_veiculo.nome,
-            data_inicio=self.data_inicio.isoformat(),
+            data_inicio=self.data_inicio.isoformat() if self.data_inicio else None,
             data_conclusao=self.data_conclusao.isoformat() if self.data_conclusao else None,
             estampador=dict(
                 nome=self.estampador.nome,
