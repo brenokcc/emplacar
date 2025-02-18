@@ -257,7 +257,7 @@ class Emplacamento(models.Model):
                     representante=dict(
                         nome=self.representante.nome,
                         cpf=self.representante.cpf_cnpj,
-                    ),
+                    ) if self.representante else None,
                 ),
                 descarte=dict(
                     boletim_ocorrencia=self.foto_boletim_ocorrencia.url if self.foto_boletim_ocorrencia else None,
