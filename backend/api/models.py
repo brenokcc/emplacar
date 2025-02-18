@@ -218,10 +218,10 @@ class Emplacamento(models.Model):
                 longitude=self.longitude,
             ),
             operador=dict(
-                nome=self.operador.nome if self.operador else None,
+                nome=self.operador.nome,
                 cpf=self.operador.cpf_cnpj,
                 foto=self.operador.foto.url
-            ),
+            ) if self.operador else None,
             veiculo=dict(
                 zero_kilometro=self.zero_kilometro,
                 cor=self.cor.nome,
