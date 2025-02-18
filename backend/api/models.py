@@ -218,7 +218,7 @@ class Emplacamento(models.Model):
                 longitude=self.longitude,
             ),
             operador=dict(
-                nome=self.operador.nome,
+                nome=self.operador.nome if self.operador else None,
                 cpf=self.operador.cpf_cnpj,
                 foto=self.operador.foto.url
             ),
