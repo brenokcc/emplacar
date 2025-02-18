@@ -77,7 +77,7 @@ class Pessoa(models.Model):
     objects = PessoaQuerySet()
 
     def __str__(self):
-        return f'Pessoa {self.id}'
+        return self.nome
     
     def get_foto(self):
         return Image(self.foto)
@@ -149,7 +149,7 @@ class Emplacamento(models.Model):
     data_conclusao = models.DateTimeField(verbose_name='Data/Hora de Conclusão', null=True, blank=True)
 
     estampador = models.ForeignKey(Estampador, verbose_name='Estampador', on_delete=models.CASCADE)
-    operador = models.ForeignKey(Pessoa, verbose_name='Operador', on_delete=models.CASCADE, blank=True)
+    operador = models.ForeignKey(Pessoa, verbose_name='Operador', on_delete=models.CASCADE, blank=True, null=True)
     foto_operador = models.ImageField(verbose_name='Foto do Operador', upload_to='images', null=True, blank=True)
 
     latitude = models.CharField(verbose_name='Latitulde', null=True)
