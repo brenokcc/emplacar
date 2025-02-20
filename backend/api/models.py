@@ -127,23 +127,28 @@ class Emplacamento(models.Model):
     def formfactory(self):
         return (
             super().formfactory()
-            .fieldset('Dados Gerais', (('estampador', 'autorizacao'), ('data_inicio', 'data_conclusao')))
+            .fieldset('Dados Gerais', (('estampador', 'autorizacao'), 'via_procuracao', ('data_inicio', 'data_conclusao')))
             .fieldset('Dados do Operador', ('operador', 'foto_operador'),)
             .fieldset('Geolocalização', (('latitude', 'longitude'),))
-            .fieldset('Dados do Veículo', (('numero_placa','tipo_veiculo'), ('cor', 'modelo'), 'zero_kilometro', 'proprietario:pessoa.cadastrar',))
+            .fieldset('Dados do Veículo', (('numero_placa','tipo_veiculo'), ('cor', 'modelo'), ('zero_kilometro', 'segunda_placa_traseira', 'leiloado'), 'proprietario:pessoa.cadastrar',))
             .fieldset('Chassi', ('numero_chassi', 'foto_chassi',))
             .fieldset('Fotos do Veículo', ('foto_dianteira', 'foto_traseira',))
             .fieldset('Fotos da Placa', ('foto_placa_dianteira', 'foto_placa_traseira', 'foto_segunda_placa_traseira'))
+            .fieldset('QrCode da Placa', ('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira'))
             .fieldset('Descarte', ('foto_boletim_ocorrencia', 'foto_descarte_placa_dianteira', 'foto_descarte_placa_traseira', 'foto_descarte_segunda_placa_traseira'))
             .fieldset('Procuração', ('representante', 'foto_procuracao',))
+            .fieldset('Leilão', ('terceiro_interessado',))
         ) if self.pk else (
             super().formfactory()
-            .fieldset('Dados Gerais', (('estampador', 'autorizacao'),))
-            .fieldset('Dados do Veículo', (('numero_placa','tipo_veiculo'), ('cor', 'modelo'), 'zero_kilometro', 'proprietario:pessoa.cadastrar',))
+            .fieldset('Dados Gerais', (('estampador', 'autorizacao'),'via_procuracao'))
+            .fieldset('Dados do Veículo', (('numero_placa','tipo_veiculo'), ('cor', 'modelo'), ('zero_kilometro', 'segunda_placa_traseira', 'leiloado'), 'proprietario:pessoa.cadastrar',))
             .fieldset('Chassi', ('numero_chassi',))
+            .fieldset('QrCode da Placa', ('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira'))
             .fieldset('Procuração', ('representante',))
+            .fieldset('Leilão', ('terceiro_interessado',))
         )
     autorizacao = models.CharField(verbose_name='Autorização', null=True)
+    via_procuracao = models.BooleanField(verbose_name='Via Procuração?', default=False)
     tipo_veiculo = models.ForeignKey(TipoVeiculo, verbose_name='Tipo de Veículo', on_delete=models.CASCADE, null=True)
     data_inicio = models.DateTimeField(verbose_name='Data/Hora de Início', null=True, blank=True)
     data_conclusao = models.DateTimeField(verbose_name='Data/Hora de Conclusão', null=True, blank=True)
@@ -158,7 +163,9 @@ class Emplacamento(models.Model):
     numero_placa = models.CharField(verbose_name='Número do Placa')
     proprietario = models.ForeignKey(Pessoa, verbose_name='Proprietário', on_delete=models.CASCADE, related_name='p2')
 
-    zero_kilometro = models.BooleanField(verbose_name="Zero Kilômetro", blank=True)
+    zero_kilometro = models.BooleanField(verbose_name="Zero Kilômetro?", blank=True)
+    segunda_placa_traseira = models.BooleanField(verbose_name='Segunda Placa Traseira?', default=False)
+    leiloado = models.BooleanField(verbose_name='Leiloado?', default=False)
     cor = models.ForeignKey(Cor, verbose_name='Cor', on_delete=models.CASCADE)
     modelo = models.ForeignKey(Modelo, verbose_name='Modelo', on_delete=models.CASCADE)
 
@@ -172,6 +179,10 @@ class Emplacamento(models.Model):
     foto_placa_traseira = models.ImageField(verbose_name='Foto da Placa Traseira', upload_to='images', null=True, blank=True)
     foto_segunda_placa_traseira = models.ImageField(verbose_name='Foto da Segunda Placa Traseira', upload_to='images', null=True, blank=True)
 
+    qrcode_placa_dianteira = models.CharField(verbose_name='QrCode da Placa Dianteira', null=True, blank=True)
+    qrcode_placa_traseira = models.CharField(verbose_name='QrCode da Placa Traseira', null=True, blank=True)
+    qrcode_segunda_placa_traseira = models.CharField(verbose_name='QrCode da Segunda Placa Traseira', null=True, blank=True)
+
     foto_boletim_ocorrencia = models.ImageField(verbose_name='Foto do Boletim de Ocorrência', upload_to='images', null=True, blank=True)
     foto_descarte_placa_dianteira = models.ImageField(verbose_name='Foto do Descarte da Placa Dianteira', upload_to='images', null=True, blank=True)
     foto_descarte_placa_traseira = models.ImageField(verbose_name='Foto do Descarte da Placa Traseira', upload_to='images', null=True, blank=True)
@@ -179,6 +190,8 @@ class Emplacamento(models.Model):
 
     representante = models.ForeignKey(Pessoa, verbose_name='Representante', on_delete=models.CASCADE, null=True, blank=True, related_name='p3')
     foto_procuracao = models.ImageField(verbose_name='Foto da Procuração', upload_to='images', null=True, blank=True)
+
+    terceiro_interessado = models.ForeignKey(Pessoa, verbose_name='Terceiro Interessado', on_delete=models.CASCADE, null=True, blank=True, related_name='p4')
 
     class Meta:
         verbose_name = 'Emplacamento'
@@ -192,6 +205,7 @@ class Emplacamento(models.Model):
             id=self.id,
             autorizacao=self.autorizacao,
             tipo_veiculo=self.tipo_veiculo.nome,
+            via_procuracao=self.via_procuracao,
             data_inicio=self.data_inicio.isoformat() if self.data_inicio else None,
             data_conclusao=self.data_conclusao.isoformat() if self.data_conclusao else None,
             estampador=dict(
@@ -224,6 +238,8 @@ class Emplacamento(models.Model):
             ) if self.operador else None,
             veiculo=dict(
                 zero_kilometro=self.zero_kilometro,
+                segunda_placa_traseira=self.segunda_placa_traseira,
+                leiloado=self.leiloado,
                 cor=self.cor.nome,
                 marca=self.modelo.marca.nome,
                 modelo=self.modelo.nome,
@@ -257,6 +273,11 @@ class Emplacamento(models.Model):
                     representante=dict(
                         nome=self.representante.nome,
                         cpf=self.representante.cpf_cnpj,
+                        foto=self.representante.foto.url if self.representante.foto else None,
+                        documento=dict(
+                            frente=self.representante.documento.foto.url,
+                            verso=self.representante.documento.verso.url if self.representante.documento.verso else None
+                        ) if self.representante.documento else None
                     ) if self.representante else None,
                 ),
                 descarte=dict(
@@ -266,7 +287,16 @@ class Emplacamento(models.Model):
                         placa_traseira=self.foto_descarte_placa_traseira.url if self.foto_descarte_placa_traseira else None,
                         placa_segunda_traseira=self.foto_descarte_segunda_placa_traseira.url if self.foto_descarte_segunda_placa_traseira else None
                     )
-                )
+                ),
+                terceiro_interessado=dict(
+                    nome=self.terceiro_interessado.nome,
+                    cpf=self.terceiro_interessado.cpf_cnpj,
+                    foto=self.terceiro_interessado.foto.url if self.terceiro_interessado.foto else None,
+                    documento=dict(
+                        frente=self.terceiro_interessado.documento.foto.url,
+                        verso=self.terceiro_interessado.documento.verso.url if self.terceiro_interessado.documento.verso else None
+                    ) if self.terceiro_interessado.documento else None
+                ) if self.terceiro_interessado else None,
             )
         ) if detalhar else dict(
             id=self.id,
@@ -279,7 +309,6 @@ class Emplacamento(models.Model):
                 cnpj=self.estampador.cnpj,
             ),
             veiculo=dict(
-                zero_kilometro=self.zero_kilometro,
                 cor=self.cor.nome,
                 marca=self.modelo.marca.nome,
                 modelo=self.modelo.nome,
